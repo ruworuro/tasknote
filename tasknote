@@ -2,7 +2,7 @@
 
 ###############################################################################
 # tasknote - associate note file with individual tasks in taskwarrior
-# 
+#
 # Copyright 2011, Alan Bowen, bowen@tcnj.edu.
 # All rights reserved.
 #
@@ -33,18 +33,27 @@
 ###############################################################################
 
 # Updated 2012, Michael Bobroski <bobroski@gmail.com>
-# 	- Updated to work with Taskwarrior 2.0
-# 	- View Note Feature
+#	- Updated to work with Taskwarrior 2.0
+#	- View Note Feature
 #	- Allow relative path for FOLDER
 
-EDITOR=vim
+# Got all config of task show
+declare -A TASKNOTE
 TASKBIN=task
-VIEWER=cat
+
+while read line; do
+	array=()
+	array=($line)
+	TASKNOTE[${array[0]^^}]=
+done < <($TASKBIN show tasknote | sed -n '/^tasknote/ s/^tasknote.//p')
+
+EDITOR=${TASNOTE[EDITOR]:-editor}
+VIEWER=${TASNOTE[VIEWER]:-cat}
 
 # FOLDER to store notes in. Must already exist.
 # If you sync tasks, FOLDER should be a location that syncs and is available to
 # other computers, i.e. ~/dropbox/tasknotes
-FOLDER="~/Dropbox/tasks/notes/"
+FOLDER=${TASNOTE[FOLDER]:-~/notas}
 
 # Check for existence of $FOLDER
 if [ ! -d $FOLDER ]; then
@@ -69,7 +78,7 @@ NOTEMSG="See Notes File"
 # Display usage if task number not supplied on cli
 if [ $# -lt 1 -o $# -gt 2 ]; then
 	echo "Usage:"
-   	echo "  New/Edit note: $0 <id>"
+	echo "  New/Edit note: $0 <id>"
 	echo "  View note:     $0 <id> v"
 	exit 1
 fi
@@ -103,12 +112,12 @@ $SHELL -c "$EDITOR $file"
 # Create a note message representing the first line of
 # the edited note file.
 if [ -f $file ]; then
-  NOTEMSG="[tasknote] `head -1 $file`"
-  # remove any previous annotation - we want only a single
-  # tasknote annotation. Detection works through the
-  # [tasknote] annotation prefix
-  $SHELL -c "$TASKBIN $* denotate \"[tasknote]\""
-  $SHELL -c "$TASKBIN $* annotate '$NOTEMSG'"
+	NOTEMSG="[tasknote] `head -1 $file`"
+	# remove any previous annotation - we want only a single
+	# tasknote annotation. Detection works through the
+	# [tasknote] annotation prefix
+	$SHELL -c "$TASKBIN $* denotate \"[tasknote]\""
+	$SHELL -c "$TASKBIN $* annotate '$NOTEMSG'"
 fi
 
 exit 0
