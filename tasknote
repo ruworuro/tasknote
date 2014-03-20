@@ -44,16 +44,16 @@ TASKBIN=task
 while read line; do
 	array=()
 	array=($line)
-	TASKNOTE[${array[0]^^}]=
+	TASKNOTE[${array[0]^^}]=${array[1]}
 done < <($TASKBIN show tasknote | sed -n '/^tasknote/ s/^tasknote.//p')
 
-EDITOR=${TASNOTE[EDITOR]:-editor}
-VIEWER=${TASNOTE[VIEWER]:-cat}
+EDITOR=${TASKNOTE[EDITOR]:-vim}
+VIEWER=${TASKNOTE[VIEWER]:-cat}
 
 # FOLDER to store notes in. Must already exist.
 # If you sync tasks, FOLDER should be a location that syncs and is available to
 # other computers, i.e. ~/dropbox/tasknotes
-FOLDER=${TASNOTE[FOLDER]:-~/notas}
+FOLDER=${TASKNOTE[FOLDER]:-~/notas}
 
 # Check for existence of $FOLDER
 if [ ! -d $FOLDER ]; then
